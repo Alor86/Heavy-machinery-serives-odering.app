@@ -159,65 +159,63 @@ export default function App() {
       className="h-screen w-screen bg-slate-900 flex flex-col items-center justify-start select-none overflow-hidden font-sans relative"
     >
       {/* 
-        Sleek, High-Fidelity Presentation Controls Panel.
-        Allows university admission reviewers to zoom, auto-fit, or go frame-less.
-        Designed elegantly in dark cyber-slate style to look high-tech and incredibly polished.
+        Ultra-refined, Low-Key Design Review Header.
+        Formulated as a high-fidelity sandbox inspector panel with supreme typography and clear structure.
       */}
       <div 
         id="presentation-control-bar"
-        className="hidden sm:flex w-full h-14 bg-slate-950 border-b border-slate-800/80 px-6 items-center justify-between z-50 shrink-0 text-white"
+        className="hidden sm:flex w-full h-14 bg-slate-900 border-b border-slate-800/60 px-6 items-center justify-between z-50 shrink-0 text-white select-none"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-900/30">
-            <span className="font-sans text-xs font-black tracking-tighter">HG</span>
+          <div className="w-6 h-6 rounded bg-[#ff8c00] flex items-center justify-center text-white shadow-sm shadow-[#ff8c00]/10">
+            <span className="font-sans text-[10px] font-black tracking-tighter">HG</span>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black tracking-wide uppercase text-slate-100">HeavyGear Simulator build</span>
-              <span className="px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-[9px] font-bold text-emerald-400 border border-emerald-500/25 uppercase tracking-widest leading-none">
-                Admission Review Prep
+              <span className="text-xs font-semibold tracking-tight text-slate-250 uppercase">HeavyGear Simulator Sandbox</span>
+              <span className="px-1.5 py-0.5 rounded-sm bg-indigo-500/10 text-[8px] font-bold text-indigo-400 border border-indigo-500/20 uppercase tracking-widest leading-none">
+                Interactive Review
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 font-medium">Use presentation controls below for optimal viewing comfort on your screen size.</p>
           </div>
         </div>
 
-        {/* View mode buttons */}
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+        {/* Presentation Controls Segment Selector */}
+        <div className="flex items-center gap-5">
+          <div className="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-850">
             <button
               onClick={() => {
                 setUseDeviceFrame(true);
-                triggerBanner('Switched to simulated smartphone device mockup frame.', 'success');
+                triggerBanner('Smartphone simulator layout active.', 'success');
               }}
-              className={`p-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 cursor-pointer ${
                 useDeviceFrame 
-                  ? 'bg-indigo-600 text-white shadow-sm' 
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-slate-850 text-[#ff8c00] font-bold shadow-xs' 
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
-              <span>Device Frame</span>
+              <span>Simulated Phone</span>
             </button>
             <button
               onClick={() => {
                 setUseDeviceFrame(false);
-                triggerBanner('Switched to edge-to-edge layout view.', 'success');
+                triggerBanner('Edge-to-edge desktop web portal active.', 'success');
               }}
-              className={`p-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-md text-[11px] font-medium transition-all flex items-center gap-2 cursor-pointer ${
                 !useDeviceFrame 
-                  ? 'bg-indigo-600 text-white shadow-sm' 
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-slate-850 text-[#ff8c00] font-bold shadow-xs' 
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Monitor className="w-3.5 h-3.5" />
-              <span>Full Screen Web View</span>
+              <span>Web Interface</span>
             </button>
           </div>
 
-          {/* Scale selection */}
+          {/* Scale Control (Shown in smartphone frame mode only) */}
           {useDeviceFrame && (
-            <div className="flex items-center gap-4 border-l border-slate-800 pl-6">
+            <div className="flex items-center gap-3 border-l border-slate-800 pl-4">
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => {
@@ -225,15 +223,14 @@ export default function App() {
                     setScale(prev => Math.max(0.55, Math.min(1.2, parseFloat((prev - 0.05).toFixed(2)))));
                   }}
                   disabled={scale <= 0.55}
-                  className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white disabled:opacity-40 transition-all cursor-pointer"
+                  className="w-6 h-6 rounded bg-slate-950 border border-slate-800/80 flex items-center justify-center text-slate-400 hover:text-white disabled:opacity-25 transition-all cursor-pointer"
                   title="Zoom Out"
                 >
-                  <ZoomOut className="w-3.5 h-3.5" />
+                  <ZoomOut className="w-3 h-3" />
                 </button>
                 
-                {/* Scale Display Badge */}
-                <div className="text-center min-w-[70px] px-2">
-                  <span className="text-xs font-mono font-bold text-indigo-300">
+                <div className="text-center min-w-[44px]">
+                  <span className="text-[10px] font-mono font-bold text-slate-400">
                     {Math.round(scale * 100)}%
                   </span>
                 </div>
@@ -244,27 +241,27 @@ export default function App() {
                     setScale(prev => Math.max(0.55, Math.min(1.2, parseFloat((prev + 0.05).toFixed(2)))));
                   }}
                   disabled={scale >= 1.2}
-                  className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white disabled:opacity-40 transition-all cursor-pointer"
+                  className="w-6 h-6 rounded bg-slate-950 border border-slate-800/80 flex items-center justify-center text-slate-400 hover:text-white disabled:opacity-25 transition-all cursor-pointer"
                   title="Zoom In"
                 >
-                  <ZoomIn className="w-3.5 h-3.5" />
+                  <ZoomIn className="w-3 h-3" />
                 </button>
               </div>
 
-              {/* Auto-Fit Toggle */}
+              {/* Automatic Responsive Height Fit */}
               <button
                 onClick={() => {
                   setIsAutoFit(!isAutoFit);
-                  triggerBanner(isAutoFit ? 'Manual scale mode active.' : 'Full auto-fit height scaling is active.', 'success');
+                  triggerBanner(isAutoFit ? 'Manual scale mode active.' : 'Fitting screen size dynamically.', 'success');
                 }}
-                className={`p-1.5 px-3 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 cursor-pointer ${
+                className={`px-2.5 py-1 rounded text-[10px] font-bold transition-all border flex items-center gap-1 cursor-pointer ${
                   isAutoFit 
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white'
+                    ? 'bg-[#ff8c00]/10 text-[#ff8c00] border-[#ff8c00]/20' 
+                    : 'bg-slate-950 text-slate-500 border-slate-850 hover:text-slate-350'
                 }`}
               >
-                <Maximize2 className="w-3.5 h-3.5" />
-                <span>Auto-Fit Screen</span>
+                <Maximize2 className="w-3 h-3" />
+                <span>Auto-Fit</span>
               </button>
             </div>
           )}
@@ -299,7 +296,7 @@ export default function App() {
             className={useDeviceFrame ? (
               "w-[440px] h-[890px] bg-white rounded-[48px] shadow-[0_0_0_12px_#141414,0_0_0_14px_#334155,0_32px_64px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col relative border-[2px] border-slate-700/50 shrink-0"
             ) : (
-              "w-screen h-screen bg-slate-50 flex flex-col relative overflow-hidden shrink-0"
+              "w-full h-full bg-slate-50 flex flex-col relative overflow-hidden shrink-0 animate-fadeIn"
             )}
           >
             {/* Phone Top Notch & Camera Simulator (Visible only in desktop scale frame view) */}
