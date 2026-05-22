@@ -24,6 +24,7 @@ interface PortalViewProps {
   userEmail: string;
   userRole: Role;
   onLogout?: () => void;
+  isFullWebView?: boolean;
 }
 
 export default function PortalView({
@@ -31,9 +32,10 @@ export default function PortalView({
   userEmail,
   userRole,
   onLogout = () => {},
+  isFullWebView = false,
 }: PortalViewProps) {
   if (userRole === 'customer') {
-    return <CustomerBookView userEmail={userEmail} onLogout={onLogout} />;
+    return <CustomerBookView userEmail={userEmail} onLogout={onLogout} isFullWebView={isFullWebView} />;
   }
   const [equipmentList, setEquipmentList] = useState<EquipmentItem[]>(() => {
     const saved = localStorage.getItem('hg_equipment');
@@ -130,7 +132,7 @@ export default function PortalView({
   };
 
   return (
-    <div id={id} className="w-full max-w-[440px] flex flex-col gap-5 pb-8 font-sans">
+    <div id={id} className={`w-full ${isFullWebView ? 'max-w-6xl px-4 sm:px-6 lg:px-8 py-6' : 'max-w-[440px]'} mx-auto flex flex-col gap-5 pb-8 font-sans`}>
       {/* Portal Header Greeting (Indigo Glow Panel) */}
       <div id="portal-user-welcome" className="bg-indigo-600 p-4 rounded-3xl flex items-center justify-between text-white shadow-xl shadow-indigo-100 sticky top-0 z-10">
         <div className="space-y-0.5">
@@ -310,7 +312,7 @@ export default function PortalView({
           </span>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className={`grid ${isFullWebView ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-3`}>
           {equipmentList.map((asset) => (
             <div
               key={asset.id}
@@ -383,7 +385,7 @@ export default function PortalView({
           </span>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className={`grid ${isFullWebView ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-3`}>
           {requestList.map((req) => (
             <div
               key={req.id}

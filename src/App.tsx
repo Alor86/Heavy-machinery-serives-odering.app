@@ -299,7 +299,7 @@ export default function App() {
             className={useDeviceFrame ? (
               "w-[440px] h-[890px] bg-white rounded-[48px] shadow-[0_0_0_12px_#141414,0_0_0_14px_#334155,0_32px_64px_rgba(0,0,0,0.55)] overflow-hidden flex flex-col relative border-[2px] border-slate-700/50 shrink-0"
             ) : (
-              "w-screen h-screen sm:max-w-xl bg-white flex flex-col relative sm:shadow-2xl sm:border-x sm:border-slate-200 overflow-hidden shrink-0"
+              "w-screen h-screen bg-slate-50 flex flex-col relative overflow-hidden shrink-0"
             )}
           >
             {/* Phone Top Notch & Camera Simulator (Visible only in desktop scale frame view) */}
@@ -458,7 +458,7 @@ export default function App() {
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className="w-full h-full flex flex-col items-center"
                   >
-                    <PortalView userEmail={userEmail} userRole={userRole} onLogout={handleLogout} />
+                    <PortalView userEmail={userEmail} userRole={userRole} onLogout={handleLogout} isFullWebView={!useDeviceFrame} />
                   </motion.div>
                 )}
               </AnimatePresence>

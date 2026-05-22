@@ -52,6 +52,7 @@ interface CustomerBookViewProps {
   id?: string;
   userEmail: string;
   onLogout: () => void;
+  isFullWebView?: boolean;
 }
 
 interface MachineryItem {
@@ -234,7 +235,7 @@ const INITIAL_HISTORY: BookingRecord[] = [
   }
 ];
 
-export default function CustomerBookView({ id = 'customer-book-view', userEmail, onLogout }: CustomerBookViewProps) {
+export default function CustomerBookView({ id = 'customer-book-view', userEmail, onLogout, isFullWebView = false }: CustomerBookViewProps) {
   // Saved states
   const [ordersCount, setOrdersCount] = useState<number>(() => {
     const saved = localStorage.getItem('hg_orders_count');
@@ -647,9 +648,10 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
             </header>
 
             {/* Scrollable Contents Grid */}
-            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28 text-center space-y-4">
-              
-              {/* Profile Header Box */}
+            <div className="flex-1 overflow-y-auto pt-4 pb-28 text-center space-y-4">
+              <div className="max-w-4xl mx-auto px-4 w-full space-y-4">
+                
+                {/* Profile Header Box */}
               <div className="bg-white border-2 border-[#1a1c1c]/15 rounded-2xl p-4 flex flex-col items-center text-center relative">
                 <div className="relative">
                   <img
@@ -942,7 +944,8 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
                   <span className="text-[8px] font-mono font-bold text-rose-450 opacity-70">HG Platform v2.4.1</span>
                 </button>
               </div>
-            </div>
+            </div> {/* closing max-w-4xl */}
+          </div>
 
             {/* Sticky Native Footer navigation */}
             <nav className="absolute bottom-0 left-0 right-0 h-16 bg-white border-t-2 border-slate-150 flex justify-around items-center px-4 z-40 select-none shadow-lg">
@@ -1026,9 +1029,10 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
             {/* Scrollable Catalog Section */}
             <div
               id="catalog-scroll-area"
-              className="flex-1 overflow-y-auto px-4 pt-4 pb-32 hide-scrollbar scroll-smooth"
+              className="flex-1 overflow-y-auto pt-4 pb-32 hide-scrollbar scroll-smooth"
             >
-              <div className="space-y-3 mb-4">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div className="space-y-3 mb-4">
                 <div className="flex justify-between items-end">
                   <div>
                     <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest leading-none">
@@ -1069,8 +1073,14 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
                 </div>
               </div>
 
-              {/* Stacked Single-Column cards fitting perfectly dynamically without grid overflowing */}
-              <div id="machinery-cards-list-stacked" className="space-y-4">
+              {/* Stacked Single-Column cards fitting perfectly dynamically without grid overflowing / Multi-column on Web View */}
+              <div 
+                id="machinery-cards-list-stacked" 
+                className={isFullWebView 
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
+                  : "space-y-4"
+                }
+              >
                 {filteredCatalog.map((item, index) => {
                   const isWaterTanker = item.id === 'MACH-01' || item.name.toLowerCase().includes('water tanker');
                   return (
@@ -1090,7 +1100,7 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
                       transition={{ delay: Math.min(index * 0.05, 0.4), duration: 0.3 }}
                       whileHover={{ scale: isWaterTanker ? 1.01 : 1.00 }}
                       whileTap={{ scale: isWaterTanker ? 0.99 : 1.00 }}
-                      className={`border-2 rounded-2xl overflow-hidden shadow-sm flex flex-col cursor-pointer transition-all duration-150 group relative ${
+                      className={`border-2 rounded-2xl overflow-hidden shadow-sm flex flex-col h-full cursor-pointer transition-all duration-150 group relative ${
                         isWaterTanker 
                           ? 'bg-white border-[#1a1c1c]/15 hover:border-[#ff8c00]' 
                           : 'bg-slate-50 border-slate-200 opacity-90'
@@ -1146,7 +1156,7 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
                       </div>
 
                       {/* Meta info footer section */}
-                      <div className={`p-3 w-full flex flex-col justify-between text-left ${isWaterTanker ? 'bg-white' : 'bg-slate-50/80'}`}>
+                      <div className={`p-3 w-full flex-1 flex flex-col justify-between text-left ${isWaterTanker ? 'bg-white' : 'bg-slate-50/80'}`}>
                         <div>
                           <div className="flex justify-between items-start">
                             <h3 className={`text-xs font-black uppercase tracking-wider ${isWaterTanker ? 'text-[#1a1c1c]' : 'text-slate-500'}`}>
@@ -1185,7 +1195,8 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
                   </div>
                 )}
               </div>
-            </div>
+            </div> {/* Closing max-w-7xl container wrapper */}
+          </div>
 
             {/* Bottom sticky Section (Progress Bar & Stats) */}
             <section className="absolute bottom-0 left-0 right-0 h-[104px] bg-white border-t-2 border-slate-150 z-25 flex flex-col justify-center px-4 pb-2 pt-1 shadow-lg shrink-0">
@@ -1411,9 +1422,15 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
                 </div>
               </div>
 
-              {/* Order history list contents - conforming to Card Item UI references inside smartphone preview container */}
-              <div className="px-4 py-4 space-y-4 max-w-md mx-auto relative z-10">
-                {filteredHistory.map((rec, index) => (
+              {/* Order history list contents - conforming to Card Item UI references inside smartphone preview container / responsive columns on desktop */}
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div 
+                  className={isFullWebView 
+                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4 relative z-10" 
+                    : "py-4 space-y-4 max-w-md mx-auto relative z-10"
+                  }
+                >
+                  {filteredHistory.map((rec, index) => (
                   <motion.div
                     key={rec.bookingId}
                     id={`invoice-item-card-${rec.bookingId}`}
@@ -1543,7 +1560,8 @@ export default function CustomerBookView({ id = 'customer-book-view', userEmail,
                   </div>
                 )}
               </div>
-            </div>
+            </div> {/* closing max-w-7xl */}
+          </div>
 
             {/* Orange Floating Action Button (FAB) at bottom-right returning back to Booking deck to place order */}
             <motion.button
