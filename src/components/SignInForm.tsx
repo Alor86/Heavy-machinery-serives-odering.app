@@ -7,6 +7,7 @@ interface SignInFormProps {
   id?: string;
   onSignInSuccess: (email: string, role: Role) => void;
   onNavigateToSignUp: () => void;
+  onNavigateToForgotPassword?: () => void;
   prefilledEmail?: string;
 }
 
@@ -14,6 +15,7 @@ export default function SignInForm({
   id = 'signin-form-container',
   onSignInSuccess,
   onNavigateToSignUp,
+  onNavigateToForgotPassword,
   prefilledEmail = '',
 }: SignInFormProps) {
   const [role, setRole] = useState<Role>('customer');
@@ -41,7 +43,29 @@ export default function SignInForm({
     // Simulate verification
     setTimeout(() => {
       setIsSubmitting(false);
-      // Accept any demo login, but persist active selection role
+      
+      const storedUsersRaw = localStorage.getItem('heavygear_users');
+      if (storedUsersRaw) {
+        try {
+          const users = JSON.parse(storedUsersRaw);
+          const matchedUser = users.find(
+            (u: any) =>
+              u.email.toLowerCase() === identifier.toLowerCase() ||
+              u.phone.replace(/\D/g, '') === identifier.replace(/\D/g, '')
+          );
+          
+          if (matchedUser) {
+            // Check password if it has one stored
+            if (matchedUser.password && matchedUser.password !== password) {
+              setErrorMsg('Incorrect secure password for this registered user account. Please try again or reset via Forgot Password.');
+              return;
+            }
+          }
+        } catch (err) {
+          // Ignore parse errors
+        }
+      }
+
       onSignInSuccess(identifier, role);
     }, 700);
   };
@@ -112,9 +136,13 @@ export default function SignInForm({
                type="button"
                id="btn-forgot-password"
                onClick={() => {
-                 setInfoTitle('RESET INITIATED');
-                 setInfoMsg('Password reset instructions have been dispatched to ' + (identifier || 'your registered credentials') + '. Please check your client workspace.');
-                 setErrorMsg('');
+                 if (onNavigateToForgotPassword) {
+                   onNavigateToForgotPassword();
+                 } else {
+                   setInfoTitle('RESET INITIATED');
+                   setInfoMsg('Password reset instructions have been dispatched to ' + (identifier || 'your registered credentials') + '. Please check your client workspace.');
+                   setErrorMsg('');
+                 }
                }}
                className="text-[10px] font-bold text-indigo-600 hover:underline cursor-pointer outline-none bg-transparent"
             >

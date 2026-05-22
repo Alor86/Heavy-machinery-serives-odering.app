@@ -6,6 +6,8 @@ import Header from './components/Header';
 import SignUpForm from './components/SignUpForm';
 import SignInForm from './components/SignInForm';
 import PortalView from './components/PortalView';
+import OtpVerification from './components/OtpVerification';
+import ForgotPassword from './components/ForgotPassword';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenMode>('SIGN_UP');
@@ -35,8 +37,27 @@ export default function App() {
     }, 4500);
   };
 
+  const [pendingSignUpUser, setPendingSignUpUser] = useState<{
+    fullName: string;
+    email: string;
+    phone: string;
+    role: Role;
+    password?: string;
+  } | null>(null);
+
   // Sign up callback
-  const handleSignUpSuccess = (fullName: string, email: string, phone: string, role: Role) => {
+  const handleSignUpSuccess = (fullName: string, email: string, phone: string, role: Role, password?: string) => {
+    // Stage registration fields, then prompt user verification
+    setPendingSignUpUser({ fullName, email, phone, role, password });
+    triggerBanner('REGISTRATION INITIALIZED: Verification SMS/email OTP required.', 'success');
+    setCurrentScreen('OTP_VERIFY');
+  };
+
+  // OTP activation callback
+  const handleOtpVerificationSuccess = () => {
+    if (!pendingSignUpUser) return;
+    const { fullName, email, phone, role, password } = pendingSignUpUser;
+
     // 1. Persist user locally
     const storedUsersRaw = localStorage.getItem('heavygear_users');
     let users = [];
@@ -47,21 +68,29 @@ export default function App() {
         users = [];
       }
     }
-    // Add new user
-    users.push({ fullName, email, phone, role });
+    // Commit verified account details
+    users.push({ fullName, email, phone, role, password });
     localStorage.setItem('heavygear_users', JSON.stringify(users));
 
     // 2. Set current auth state variables
     setUserEmail(email);
     setUserRole(role);
+    setPendingSignUpUser(null);
 
     // 3. Trigger alert and auto transition
-    triggerBanner(`ACCOUNT REGISTERED: welcome ${fullName.split(' ')[0]} to HeavyGear!`, 'success');
+    triggerBanner(`ACCOUNT ACTIVATED: Welcome ${fullName.split(' ')[0]} to HeavyGear!`, 'success');
     
     // Direct transition into live simulator portal dashboard
     setTimeout(() => {
       setCurrentScreen('PORTAL');
     }, 800);
+  };
+
+  // Reset completion callback
+  const handleResetFinished = (email: string) => {
+    setUserEmail(email);
+    setCurrentScreen('SIGN_IN');
+    triggerBanner('Security reset active. Please log in with your new credentials.', 'success');
   };
 
   // Sign in callback
@@ -97,19 +126,19 @@ export default function App() {
   return (
     <div
       id="app-root-viewport"
-      className="min-h-screen w-full bg-slate-200 flex items-center justify-center p-4 md:p-8 select-none overflow-x-hidden"
+      className="min-h-screen w-full bg-slate-100 sm:bg-slate-200 flex items-center justify-center sm:p-4 md:p-8 select-none overflow-x-hidden"
     >
       {/* 
         High-Fidelity Rugged Smartphone Wrapper Container.
-        On mobile touchscreens it goes full height/width automatically (no laptop stretch),
-        rendering exactly the consistent mobile viewport layout the user demanded.
+        Bigger and wider on desktops for superb spacing and luxurious readability,
+        goes native 100% full-width and full-height on actual mobile viewports.
       */}
       <div
         id="phone-frame-container"
-        className="w-full max-w-[360px] h-[700px] bg-white rounded-[48px] shadow-[0_0_0_10px_#1a1a1a,0_32px_64px_rgba(0,0,0,0.2)] overflow-hidden flex flex-col relative border-[2px] border-slate-400 industrial-grid"
+        className="w-full h-screen sm:h-[840px] md:h-[900px] sm:max-w-[440px] md:max-w-[480px] bg-white sm:rounded-[48px] sm:shadow-[0_0_0_10px_#1a1a1a,0_32px_64px_rgba(0,0,0,0.22)] overflow-hidden flex flex-col relative sm:border-[2px] sm:border-slate-400 industrial-grid"
       >
         {/* Phone Top Notch & Camera Simulator (Visible only on desktop scale for realism) */}
-        <div id="phone-notch-bar" className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#1a1a1a] rounded-b-2xl z-50 flex items-center justify-center">
+        <div id="phone-notch-bar" className="hidden sm:flex absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#1a1a1a] rounded-b-2xl z-50 items-center justify-center">
           <div className="w-8 h-1 bg-neutral-900 rounded-full mr-2" />
           <div className="w-1.5 h-1.5 bg-neutral-950 rounded-full border border-neutral-900" />
         </div>
@@ -117,7 +146,7 @@ export default function App() {
         {/* Dynamic Simulated Status Bar */}
         <div
           id="phone-status-bar"
-          className="w-full h-12 flex items-end justify-between px-8 pb-1.5 text-[10px] font-bold text-slate-800 shrink-0 z-40 select-none font-sans bg-transparent"
+          className="hidden sm:flex w-full h-12 items-end justify-between px-8 pb-1.5 text-[10px] font-bold text-slate-800 shrink-0 z-40 select-none font-sans bg-transparent"
         >
           <span id="status-bar-time" className="font-extrabold tracking-tight">
             {timeStr}
@@ -200,7 +229,53 @@ export default function App() {
                     setCurrentScreen('SIGN_UP');
                     triggerBanner('Returning to registration credentials form...');
                   }}
+                  onNavigateToForgotPassword={() => {
+                    setCurrentScreen('FORGOT_PASSWORD');
+                    triggerBanner('Launching live password reset helper...');
+                  }}
                   prefilledEmail={userEmail}
+                />
+              </motion.div>
+            )}
+
+            {currentScreen === 'OTP_VERIFY' && pendingSignUpUser && (
+              <motion.div
+                key="otp-panel"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.2 }}
+                className="w-full h-full flex flex-col items-center"
+              >
+                <OtpVerification
+                  fullName={pendingSignUpUser.fullName}
+                  email={pendingSignUpUser.email}
+                  phone={pendingSignUpUser.phone}
+                  onVerificationSuccess={handleOtpVerificationSuccess}
+                  onCancel={() => {
+                    setCurrentScreen('SIGN_UP');
+                    setPendingSignUpUser(null);
+                    triggerBanner('Verification aborted. Returning to registration.');
+                  }}
+                />
+              </motion.div>
+            )}
+
+            {currentScreen === 'FORGOT_PASSWORD' && (
+              <motion.div
+                key="forgot-password-panel"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.2 }}
+                className="w-full h-full flex flex-col items-center"
+              >
+                <ForgotPassword
+                  onResetFinished={handleResetFinished}
+                  onCancel={() => {
+                    setCurrentScreen('SIGN_IN');
+                    triggerBanner('Returning to sign in page.');
+                  }}
                 />
               </motion.div>
             )}
@@ -223,7 +298,7 @@ export default function App() {
         {/* Dynamic Navigation Indicator Bar (Aesthetic iOS-style bottom line) */}
         <div
           id="phone-home-indicator-wrapper"
-          className="absolute bottom-1 right-0 left-0 h-5 flex justify-center items-center pointer-events-none z-40 bg-white/75 backdrop-blur-xs select-none"
+          className="hidden sm:flex absolute bottom-1 right-0 left-0 h-5 justify-center items-center pointer-events-none z-40 bg-white/75 backdrop-blur-xs select-none"
         >
           <div className="w-32 h-1 bg-neutral-900/60 rounded-full" />
         </div>

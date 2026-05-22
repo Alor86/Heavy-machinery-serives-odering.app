@@ -1,12 +1,13 @@
 export type Role = 'customer' | 'provider';
 
-export type ScreenMode = 'SIGN_UP' | 'SIGN_IN' | 'PORTAL' | 'TERMS_OF_SERVICE';
+export type ScreenMode = 'SIGN_UP' | 'SIGN_IN' | 'PORTAL' | 'TERMS_OF_SERVICE' | 'OTP_VERIFY' | 'FORGOT_PASSWORD';
 
 export interface UserAccount {
   fullName: string;
   email: string;
   phone: string;
   role: Role;
+  password?: string;
 }
 
 export interface EquipmentItem {

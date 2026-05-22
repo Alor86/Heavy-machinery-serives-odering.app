@@ -5,7 +5,7 @@ import RoleToggle from './RoleToggle';
 
 interface SignUpFormProps {
   id?: string;
-  onSignUpSuccess: (fullName: string, email: string, phone: string, role: Role) => void;
+  onSignUpSuccess: (fullName: string, email: string, phone: string, role: Role, password?: string) => void;
   onNavigateToSignIn: () => void;
 }
 
@@ -61,10 +61,35 @@ export default function SignUpForm({
     if (!validate()) return;
 
     setIsSubmitting(true);
+
+    const storedUsersRaw = localStorage.getItem('heavygear_users');
+    let users = [];
+    if (storedUsersRaw) {
+      try {
+        users = JSON.parse(storedUsersRaw);
+      } catch {
+        users = [];
+      }
+    }
+
+    const emailExists = users.some((u: any) => u.email.toLowerCase() === email.toLowerCase());
+    if (emailExists) {
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setErrors({ email: 'Account already exists! Taking you to standard credentials sign-in...' });
+        
+        // Auto navigate to sign-in page after a small delay
+        setTimeout(() => {
+          onNavigateToSignIn();
+        }, 1600);
+      }, 600);
+      return;
+    }
+
     // Simulate API registration delay
     setTimeout(() => {
       setIsSubmitting(false);
-      onSignUpSuccess(fullName, email, phone, role);
+      onSignUpSuccess(fullName, email, phone, role, password);
     }, 900);
   };
 
